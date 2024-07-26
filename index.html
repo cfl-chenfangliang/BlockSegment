@@ -382,7 +382,6 @@
 
     const fileInput = document.getElementById('file-input');
     let imageName = "original_image";
-    // for drawer
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
@@ -399,7 +398,6 @@
     const hoverContext = hoverCanvas.getContext('2d');
     hoverCanvas.style.zIndex = -1;
 
-    // for image
     const imageCanvas = document.getElementById('image-canvas');
     const imageContext = imageCanvas.getContext('2d');
     imageCanvas.style.zIndex = -2;
@@ -409,11 +407,9 @@
     hiddenCanvas.style.zIndex = -3;
 
 
-    // for rect real-time visualization
     const tempCanvas = document.getElementById('temp-canvas');
     const tempContext = tempCanvas.getContext('2d');
     tempCanvas.style.zIndex = 1;
-    // for image-size mask canvas
     const maskcanvas = document.createElement('canvas');
     const maskcontext = maskcanvas.getContext('2d');
 
@@ -441,25 +437,20 @@
     hiddenCanvas.height = canvasHeight;
     tempCanvas.width = canvasWidth;
     tempCanvas.height = canvasHeight;
-    // for saving mask purpose
     let scaledWidth = -1;
     let scaledHeight = -1;
     let scaledX = -1;
     let scaledY = -1;
-    // global variables for image
     let scaleFactor = -1;
 
     let originalUnresizedImageData;
     let originalUnresizedMaskData;
 
-    // Add a new array to store drawn paths
     const drawnPaths = [];
-    // for eraser
     let isErasing = false;
-    // for draw mask, keep track of whether user is currently drawing
     let isDrawing = false;
     let isDown = false;
-    let lastX, lastY; // keep track of last position of the pointer
+    let lastX, lastY; 
     let isMove = false;
 
 
@@ -515,9 +506,8 @@
     // Magic tool functionality
     const replacementColor = {r: 147, g: 112, b: 219};
     const alpha_255 = 191.25;
-    const alpha_1 = 1; // for manual drawer (avoid color overlay artifact when = 0.75)
+    const alpha_1 = 1;
 
-    // canvas image xy to original image xy
     function getXYLocationInOriImage(x, y) {
         x -= scaledX;
         y -= scaledY;
@@ -537,7 +527,7 @@
         }
         if (region.hover) {
 
-            hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height); // clear the drawer canvas
+            hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
             hoverContext.save();
             hoverContext.globalAlpha = 0.7;
             hoverContext.translate(currentImgOriX, currentImgOriY);
@@ -567,8 +557,8 @@
         tempContext.drawImage(maskCtx.canvas, 0, 0);
 
         rightContext.clearRect(0, 0, rightCanvas.width, rightCanvas.height);
-        rightContext.save(); // 保存当前的绘图状态
-        rightContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        rightContext.save();
+        rightContext.translate(currentImgOriX, currentImgOriY);
         rightContext.scale(zoomLevel, zoomLevel);
         rightContext.drawImage(tempCanvas, 0, 0)
         rightContext.globalCompositeOperation = 'source-in';
@@ -585,7 +575,7 @@
         fetch('/seg_mock_data.json', {})
 
 
-            // fetch('http://192.168.36.48:7860/segment_everything_automatic_masks', {
+            // fetch('http://127.0.0.1:7860/segment_everything_automatic_masks', {
             //     method: 'POST',
             //     body: sourceImageBlob
             // })
@@ -755,20 +745,20 @@
         // pixels是像素的index，并不是实际的像素值
 
         for (let i = 0; i < pixels.length; i += 1) {
-            data[pixels[i]] = replacementColor.r; // red
-            data[pixels[i] + 1] = replacementColor.g; // green
-            data[pixels[i] + 2] = replacementColor.b; // blue
-            data[pixels[i] + 3] = alpha_255; // alpha
+            data[pixels[i]] = replacementColor.r;
+            data[pixels[i] + 1] = replacementColor.g;
+            data[pixels[i] + 2] = replacementColor.b;
+            data[pixels[i] + 3] = alpha_255;
         }
 
         if (useOffset) {
             tCtx.putImageData(canvasData, 0, 0);
 
-            thisContext.save(); // 保存当前的绘图状态
+            thisContext.save();
             if (alpha){
                 thisContext.globalAlpha = 0.7;
             }
-            thisContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+            thisContext.translate(currentImgOriX, currentImgOriY);
             thisContext.scale(zoomLevel, zoomLevel);
             thisContext.drawImage(tCanvas, 0, 0);
             thisContext.restore();
@@ -779,7 +769,6 @@
 
     function stopDrawing() {
         canvas.style.cursor = "auto";
-        // stop drawing
         isDrawing = false;
         sliderWrapper.style.display = 'none';
     }
@@ -803,7 +792,6 @@
 
 
     function handleImage(file) {
-        // Extract and store the uploaded image name
         imageName = file.name.split('.')[0];
         console.log(imageName)
 
@@ -812,12 +800,9 @@
         image.onload = async () => {
             const spinnerContainer = document.getElementById("spinner-container");
             const spinnerText = spinnerContainer.querySelector('span');
-            // Change the spinner text
             spinnerText.textContent = "图片处理中...";
-            // Show the spinner
             spinnerContainer.classList.remove("d-none");
 
-            // for keeping original sized image
             const tmp_canvas = document.createElement('canvas');
             tmp_canvas.width = image.width;
             tmp_canvas.height = image.height;
@@ -826,7 +811,6 @@
             sourceImageHeight = image.height
 
             const ctx = tmp_canvas.getContext('2d');
-            // for keeping original sized mask
             maskcanvas.width = image.width;
             maskcanvas.height = image.height;
 
@@ -841,7 +825,6 @@
             scaledX = (imageCanvas.width - scaledWidth) / 2;
             scaledY = (imageCanvas.height - scaledHeight) / 2;
 
-            // reset width and height can refresh the canvas so that prev image will not be kept
             imageCanvas.width = canvasWidth;
             imageCanvas.height = canvasHeight;
             imageContext.drawImage(image, scaledX, scaledY, scaledWidth, scaledHeight);
@@ -868,7 +851,6 @@
 
 
             // FIXME 初始化
-
             initSegment(() => {
                 spinnerContainer.classList.add("d-none");
                 console.log('finally')
@@ -885,8 +867,8 @@
         context.globalCompositeOperation = 'source-over';
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.save(); // 保存当前的绘图状态
-        context.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        context.save();
+        context.translate(currentImgOriX, currentImgOriY);
         context.scale(zoomLevel, zoomLevel);
         context.drawImage(tempCanvas, 0, 0);
         context.restore();
@@ -894,24 +876,24 @@
         clearOutOfBrush()
 
         imageContext.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-        imageContext.save(); // 保存当前的绘图状态
-        imageContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        imageContext.save();
+        imageContext.translate(currentImgOriX, currentImgOriY);
         imageContext.scale(zoomLevel, zoomLevel);
         imageContext.drawImage(hiddenCanvas, 0, 0);
         imageContext.restore();
 
 
         hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
-        hoverContext.save(); // 保存当前的绘图状态
-        hoverContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        hoverContext.save();
+        hoverContext.translate(currentImgOriX, currentImgOriY);
         hoverContext.scale(zoomLevel, zoomLevel);
         hoverContext.drawImage(hoverCanvas, 0, 0);
         hoverContext.restore();
 
 
         rightContext.clearRect(0, 0, rightCanvas.width, rightCanvas.height);
-        rightContext.save(); // 保存当前的绘图状态
-        rightContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        rightContext.save();
+        rightContext.translate(currentImgOriX, currentImgOriY);
         rightContext.scale(zoomLevel, zoomLevel);
 
         rightContext.drawImage(tempCanvas, 0, 0)
@@ -1061,7 +1043,7 @@
 
                 // 画笔的撤销
                 if (useOffset) {
-                    thisContext.save(); // 保存当前的绘图状态
+                    thisContext.save();
                     thisContext.translate(currentImgOriX, currentImgOriY)
                     thisContext.scale(zoomLevel, zoomLevel);
                 }
@@ -1145,22 +1127,18 @@
 
     // 保存结果
     function saveMask() {
-        // stop everything
         stopDrawing();
         stopMagicDrawing();
         stopErasing();
         stopMove();
 
-        // Save the mask image
         const mask_canvas = document.createElement('canvas');
         mask_canvas.width = originalUnresizedImageData.width;
         mask_canvas.height = originalUnresizedImageData.height;
 
         const mask_ctx = mask_canvas.getContext('2d');
-        // this can resize the image automatically
         mask_ctx.drawImage(tempCanvas, scaledX, scaledY, scaledWidth, scaledHeight,
             0, 0, originalUnresizedImageData.width, originalUnresizedImageData.height);
-        // change to binary mask
         const sourceMaskData = mask_ctx.getImageData(0, 0, mask_canvas.width, mask_canvas.height);
 
 
@@ -1267,7 +1245,7 @@
     // -----------------监听相关-----------------
 
     document.addEventListener('contextmenu', function (event) {
-        event.preventDefault(); // Prevent the default context menu from appearing (right-click menu in browsers)
+        event.preventDefault();
     });
 
     // 上传文件监听
@@ -1304,7 +1282,6 @@
         stopMagicDrawing();
         stopErasing();
         stopMove();
-        // toggle slider visibility
         isDrawing = true
         sliderWrapper.style.display = (sliderWrapper.style.display === 'none') ? 'block' : 'none';
     });
@@ -1326,7 +1303,6 @@
         if (drawnPaths.length > 0) {
             console.log("点击撤销2")
 
-            // Remove the last path from the array
             const lastPath = drawnPaths.pop();
 
             // 清除悬浮的
@@ -1390,13 +1366,12 @@
             isDown = true;
         }
 
-        // cfl开始绘制或者擦除
+        // 开始绘制或者擦除
         if (isDrawing || isErasing) {
             lastX = event.offsetX;
             lastY = event.offsetY;
             isDown = true;
 
-            // Start a new path
             drawnPaths.push({
                 type: isErasing ? 'eraser' : 'brush',
                 points: [],
@@ -1438,7 +1413,7 @@
                 return
 
             }
-            // cfl 擦除或者画笔拖动
+            // 擦除或者画笔拖动
             realDrawingDrawingOrErasing(event)
 
 
