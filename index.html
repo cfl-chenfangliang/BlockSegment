@@ -1,0 +1,1454 @@
+<html lang="en">
+
+<head>
+    <link href="assets/css/all.min.css" rel="stylesheet">
+    <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #canvas-wrapper {
+            position: relative;
+            width: 500px;
+            height: 500px;
+        }
+
+        .canvas-right-wrapper {
+            position: relative;
+            width: 500px;
+            height: 500px;
+        }
+
+
+        #slider-wrapper {
+            display: none;
+            z-index: 10; /* Add this line */
+            top: 47px; /* Adjust this value */
+            right: 50px; /* Adjust this value */
+        }
+
+        #canvas {
+            position: absolute;
+            border: 1px solid black;
+            width: 100%;
+            height: 100%;
+        }
+
+        #cursor-canvas {
+            position: absolute;
+            border: 1px solid black;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 允许事件穿透canvas A */
+        }
+
+        #right-canvas {
+            position: absolute;
+            border: 1px solid black;
+            width: 100%;
+            height: 100%;
+        }
+
+        #hoverCanvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        #temp-canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            /*display: none;*/
+        }
+
+        #image-canvas, #temp-canvas, #hidden-canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .button-wrapper {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 4px 8px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            margin: 2px 0;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+        }
+
+        #file-input-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 500px;
+            height: 500px;
+            cursor: pointer;
+        }
+
+        #file-input-wrapper input[type=file] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        #spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #spinner-container span {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+            margin-top: 10px;
+        }
+
+
+        .ai-image-accurate-cutting-main {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .accurate-cutting-modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 24px;
+            color: #041133;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(4, 17, 51, 0.1);
+        }
+
+        .ai-image-accurate-cutting-head {
+            height: 78px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .cutting-head-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;      /* 允许换行 */
+            gap: 10px;           /* 设置子元素之间的间隔为10px */
+            justify-content: space-between; /* 可选：水平分布子元素，两端对齐 */
+        }
+
+        .cutting-head-right {
+            margin-left: auto;
+        }
+
+
+        .ai-image-accurate-cutting-content {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            padding: 0 30px 24px;
+        }
+
+        .ai-image-accurate-cutting-painting {
+            width: 100%;
+            display: flex;
+            position: relative;
+            justify-content: center;
+        }
+
+        .ai-image-accurate-cutting-painting-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            -webkit-transform: translate3d(-50%, 0px, 0px);
+            transform: translate3d(-50%, 0px, 0px);
+            height: 46px;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            padding: 0 16px;
+            color: #ffffff;
+            border-radius: 4px;
+        }
+
+        .painting-handler-item {
+            width: 24px;
+            height: 24px;
+            display: -ms-flexbox;
+            display: flex;
+            align-content: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .painting-handler-item-activate {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+
+        .number-item {
+            width: 62px;
+        }
+
+        .number {
+            text-align: center;
+            line-height: 24px;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+
+
+
+        .painting-move-handler-line {
+            margin: 0 16px;
+            height: 20px;
+            width: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tools-button {
+            background: #f2f3f5;
+            color: #333333;
+            border: none;
+            padding: 0 10px;
+            margin-left: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+<div class="ai-image-accurate-cutting-main">
+    <div class="accurate-cutting-modal-title">
+        Segment选块抠图
+    </div>
+
+    <div class="ai-image-accurate-cutting-head">
+        <div class="cutting-head-left">
+            <button class="tools-button" id="magic-tool">
+                <img style="width: 15px" src="assets/image/zhuashou2.png"/>
+                点选保留
+            </button>
+
+            <button class="tools-button" id="draw-mask">
+                <img style="width: 15px" src="assets/image/huabi.png"/>
+                手动涂抹
+            </button>
+            <button class="tools-button" id="eraser">
+                <img style="width: 15px" src="assets/image/xiangpicha.png"/>
+                橡皮檫
+            </button>
+        </div>
+
+        <div id="slider-wrapper">
+            <input type="range" min="1" max="100" value="20" class="slider" id="brush-size">
+        </div>
+
+        <div class="cutting-head-right">
+            <button class="tools-button" id="undo-path">
+                <img style="width: 15px" src="assets/image/chexiao.png"/>
+                撤销
+            </button>
+            <button class="tools-button" id="reset-image">
+                <img style="width: 15px" src="assets/image/qingkong.png"/>
+                清空
+            </button>
+        </div>
+
+
+
+    </div>
+
+    <div class="ai-image-accurate-cutting-content">
+
+        <div class="ai-image-accurate-cutting-painting">
+
+            <div id="canvas-wrapper">
+                <canvas id="cursor-canvas"></canvas>
+                <canvas id="canvas"></canvas>
+                <canvas id="hoverCanvas"></canvas>
+                <canvas id="image-canvas"></canvas>
+                <canvas id="temp-canvas" style="pointer-events: none;display: none"></canvas>
+
+                <canvas id="hidden-canvas" style="display: none"></canvas>
+
+                <!--            <div class="button-wrapper">-->
+
+                <!--            </div>-->
+
+                <div id="file-input-wrapper">
+                    <input type="file" id="file-input">
+                </div>
+            </div>
+
+            <div class="canvas-right-wrapper">
+                <canvas id="right-canvas"></canvas>
+            </div>
+
+            <div class="ai-image-accurate-cutting-painting-bottom">
+
+                <div id="move-button" class="painting-handler-item" onclick="moveButtonClick()">
+                    <img src="assets/image/zhuashou.png"/>
+                </div>
+
+                <div class="painting-move-handler-line" >
+                </div>
+
+                <div class="painting-handler-item" onclick="zoomOut()">
+                    <img src="assets/image/suoxiao.png"/>
+                </div>
+
+                <div class="painting-handler-item number-item" onclick="reZoom()">
+                    <span id="show-zoom-text" class="num">
+                        100%
+                    </span>
+                </div>
+
+
+                <div class="painting-handler-item" onclick="zoomIn()">
+                    <img src="assets/image/fangda.png"/>
+                </div>
+
+                <div class="painting-move-handler-line" >
+                </div>
+
+                <div class="painting-handler-item" onclick="saveMask()">
+                    <img src="assets/image/xiazai.png"/>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+<!--<div class="canvas-right-wrapper">-->
+<!--    <canvas id="temp-canvas"></canvas>-->
+<!--</div>-->
+
+<div id="spinner-container" class="position-fixed top-50 start-50 translate-middle d-none">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span style="color: #dc3545; font-size: 2em;">图片处理中...</span>
+</div>
+
+
+<script type="text/javascript">
+
+
+    const fileInput = document.getElementById('file-input');
+    let imageName = "original_image";
+    // for drawer
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+
+    const cursorCanvas = document.getElementById('cursor-canvas');
+    const cursorContext = cursorCanvas.getContext('2d');
+    cursorCanvas.style.zIndex = 1;
+
+
+    const rightCanvas = document.getElementById('right-canvas');
+    const rightContext = rightCanvas.getContext('2d');
+
+    // 鼠标移动上去时候的蒙版
+    const hoverCanvas = document.getElementById('hoverCanvas');
+    const hoverContext = hoverCanvas.getContext('2d');
+    hoverCanvas.style.zIndex = -1;
+
+    // for image
+    const imageCanvas = document.getElementById('image-canvas');
+    const imageContext = imageCanvas.getContext('2d');
+    imageCanvas.style.zIndex = -2;
+
+    const hiddenCanvas = document.getElementById('hidden-canvas')
+    const hiddenContext = hiddenCanvas.getContext('2d');
+    hiddenCanvas.style.zIndex = -3;
+
+
+    // for rect real-time visualization
+    const tempCanvas = document.getElementById('temp-canvas');
+    const tempContext = tempCanvas.getContext('2d');
+    tempCanvas.style.zIndex = 1;
+    // for image-size mask canvas
+    const maskcanvas = document.createElement('canvas');
+    const maskcontext = maskcanvas.getContext('2d');
+
+    let sourceImageWidth = -1;
+    let sourceImageHeight = -1
+
+    const canvasWidth = 500
+    const canvasHeight = 500
+
+
+    rightCanvas.width = canvasWidth
+    rightCanvas.height = canvasHeight
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    cursorCanvas.width = canvasWidth
+    cursorCanvas.height = canvasHeight
+
+    hoverCanvas.width = canvasWidth;
+    hoverCanvas.height = canvasHeight;
+    imageCanvas.width = canvasWidth;
+    imageCanvas.height = canvasHeight;
+    hiddenCanvas.width = canvasWidth;
+    hiddenCanvas.height = canvasHeight;
+    tempCanvas.width = canvasWidth;
+    tempCanvas.height = canvasHeight;
+    // for saving mask purpose
+    let scaledWidth = -1;
+    let scaledHeight = -1;
+    let scaledX = -1;
+    let scaledY = -1;
+    // global variables for image
+    let scaleFactor = -1;
+
+    let originalUnresizedImageData;
+    let originalUnresizedMaskData;
+
+    // Add a new array to store drawn paths
+    const drawnPaths = [];
+    // for eraser
+    let isErasing = false;
+    // for draw mask, keep track of whether user is currently drawing
+    let isDrawing = false;
+    let isDown = false;
+    let lastX, lastY; // keep track of last position of the pointer
+    let isMove = false;
+
+
+    const slider = document.getElementById("brush-size");
+    let brushSize = slider.value;
+
+    let sourceImageBlob = undefined
+    let scalImageBlob = undefined
+
+    const sliderWrapper = document.getElementById('slider-wrapper');
+    sliderWrapper.style.display = 'none';
+
+    let zoomLevel = 1
+
+    // 当前图片的原点
+    let currentImgOriX = 0;
+    let currentImgOriY = 0;
+
+    let lastMoveX, lastMoveY;
+    let lastCursorX, lastCursorY;
+
+    // 手动缩放的缩放步长
+    let zoomManualStepLevel = 0.1;
+    // 滚轮缩放的缩放步长
+    let zoomWheelStepLevel = 0.02;
+
+    const resetButton = document.getElementById('reset-image');
+    const drawMaskButton = document.getElementById('draw-mask');
+    const segmentButton = document.getElementById('magic-tool');
+    const eraserButton = document.getElementById('eraser');
+    const fileInputWrapper = document.getElementById('file-input-wrapper');
+    const undoPathButton = document.getElementById('undo-path');
+
+    const moveButton = document.getElementById('move-button')
+
+
+    async function canvasToBlob(canvas) {
+        return new Promise((resolve, reject) => {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error("Canvas to Blob conversion failed"));
+                }
+            });
+        });
+    }
+
+    async function blobToByteArray(blob) {
+        return new Uint8Array(await new Response(blob).arrayBuffer());
+    }
+
+    // Magic tool functionality
+    const replacementColor = {r: 147, g: 112, b: 219};
+    const alpha_255 = 191.25;
+    const alpha_1 = 1; // for manual drawer (avoid color overlay artifact when = 0.75)
+
+    // canvas image xy to original image xy
+    function getXYLocationInOriImage(x, y) {
+        x -= scaledX;
+        y -= scaledY;
+
+        x /= scaleFactor;
+        y /= scaleFactor;
+
+        x = Math.round(x);
+        y = Math.round(y);
+
+        return {x, y};
+    }
+
+    function drawRegionHover(region) {
+        if (isErasing || isDrawing || isMove) {
+            return
+        }
+        if (region.hover) {
+
+            hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height); // clear the drawer canvas
+            hoverContext.save();
+            hoverContext.globalAlpha = 0.7;
+            hoverContext.translate(currentImgOriX, currentImgOriY);
+            hoverContext.scale(zoomLevel, zoomLevel);
+            hoverContext.drawImage(region.maskCtx.canvas, 0, 0);
+            hoverContext.restore();
+
+        }
+    }
+
+    function drawRegionClicked(region) {
+        if (isErasing || isDrawing || isMove) {
+            return
+        }
+        context.globalCompositeOperation = 'source-over';
+        tempContext.globalCompositeOperation = 'source-over';
+
+        const maskCtx = region.maskCtx
+
+        context.save();
+        context.globalAlpha = 0.7;
+        context.translate(currentImgOriX, currentImgOriY);
+        context.scale(zoomLevel, zoomLevel);
+        context.drawImage(maskCtx.canvas, 0, 0);
+        context.restore();
+
+        tempContext.drawImage(maskCtx.canvas, 0, 0);
+
+        rightContext.clearRect(0, 0, rightCanvas.width, rightCanvas.height);
+        rightContext.save(); // 保存当前的绘图状态
+        rightContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        rightContext.scale(zoomLevel, zoomLevel);
+        rightContext.drawImage(tempCanvas, 0, 0)
+        rightContext.globalCompositeOperation = 'source-in';
+        rightContext.drawImage(hiddenCanvas, 0, 0);
+        rightContext.globalCompositeOperation = 'source-over';
+        rightContext.restore();
+
+    }
+
+    function initSegment(finishFunc) {
+
+        console.log("初始化")
+
+        fetch('/seg_mock_data.json', {})
+
+
+            // fetch('http://192.168.36.48:7860/segment_everything_automatic_masks', {
+            //     method: 'POST',
+            //     body: sourceImageBlob
+            // })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("抠图：", data)
+                region_masks = []
+                for (let i = 0; i < data.length; i++) {
+
+                    const tempCanvas = document.createElement('canvas');
+
+                    tempCanvas.width = canvas.width
+                    tempCanvas.height = canvas.height
+
+                    const ctx = tempCanvas.getContext('2d', {willReadFrequently: true});
+
+                    // 创建 Image 对象
+                    const img = new Image();
+                    img.src = `data:image/png;base64,${data[i].encodedMask}`;
+
+                    img.onload = () => {
+
+                        const scaleMaskCanvas = document.createElement('canvas');
+                        const scaleMaskCtx = scaleMaskCanvas.getContext("2d")
+                        scaleMaskCanvas.width = sourceImageWidth
+                        scaleMaskCanvas.height = sourceImageHeight
+                        scaleMaskCtx.scale(scaleFactor, scaleFactor);
+                        scaleMaskCtx.drawImage(img, 0, 0)
+
+                        ctx.drawImage(scaleMaskCanvas, scaledX, scaledY);
+
+                        // 获取 Canvas 上的像素数据
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const pixelsTemp = imageData.data;
+
+                        // 遍历像素数据并将黑色像素的透明度设置为 0
+                        for (let i = 0; i < pixelsTemp.length; i += 4) {
+                            const r = pixelsTemp[i];     // Red
+
+                            // 检查是否为黑色像素
+                            if (r === 0) {
+                                pixelsTemp[i + 3] = 0; // 将 alpha 通道设置为 0（完全透明）
+                            } else {
+                                pixelsTemp[i] = 147
+                                pixelsTemp[i + 1] = 112
+                                pixelsTemp[i + 2] = 219
+                            }
+                        }
+
+                        // 将修改后的像素数据放回 Canvas
+                        ctx.putImageData(imageData, 0, 0)
+
+                        // 获取像素数据
+                        const maskImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const pixels = maskImageData.data;
+
+                        // 输出像素数据
+                        region_masks.push({
+                            base64: data[i].encodedMask,
+                            pixels: pixels,
+                            imageData: maskImageData,
+                            maskCtx: ctx,
+                            hoverColor: 'rgba(255, 255, 0, 0.5)',
+                            clickedColor: 'rgba(255, 255, 0, 1)',
+                            clicked: false
+                        })
+                    };
+                }
+
+                // 监听鼠标移动事件
+                canvas.addEventListener('mousemove', (event) => {
+                    if (isErasing || isDrawing || isMove) {
+                        return
+                    }
+
+                    let x = event.offsetX / zoomLevel - currentImgOriX/ zoomLevel
+                    let y = event.offsetY / zoomLevel - currentImgOriY/ zoomLevel
+
+                    let anyMatch = false
+                    region_masks.forEach(region => {
+
+                        // 计算蒙版中的像素索引
+                        const pixelIndex = (Math.floor(y) * canvas.width + Math.floor(x)) * 4;
+                        const alpha = region.pixels[pixelIndex + 3];
+
+                        // 判断像素是否透明
+                        if (alpha > 0) {
+                            region.hover = true;
+                            anyMatch = true;
+                        } else {
+                            region.hover = false;
+                        }
+                        drawRegionHover(region);
+
+
+                    });
+                    if (!anyMatch) {
+                        hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
+                    }
+                });
+
+                // 监听鼠标点击事件
+                canvas.addEventListener('click', (event) => {
+                    if (isErasing || isDrawing || isMove) {
+                        return
+                    }
+                    let x = event.offsetX / zoomLevel - currentImgOriX/ zoomLevel
+                    let y = event.offsetY / zoomLevel - currentImgOriY/ zoomLevel
+
+                    let tmpH = false
+                    for (let i = region_masks.length - 1; i >= 0; i--) {
+
+                        const region = region_masks[i]
+
+                        const pixelIndex = (Math.floor(y) * canvas.width + Math.floor(x)) * 4;
+                        const alpha = region.pixels[pixelIndex + 3];
+
+                        // 判断像素是否透明
+                        if (alpha > 0) {
+
+                            if (!tmpH) {
+                                tmpH = true
+                                console.log("点击了")
+                                region.clicked = true;
+                                drawRegionClicked(region)
+
+                                // 这里推到历史的数据，应该是没有缩放的tempContext的数据
+                                const imageData = tempContext.getImageData(0, 0, tempCanvas.width, tempCanvas.height, {willReadFrequently: true});
+
+                                const data = []
+                                for (let i = 0; i < imageData.data.length; i += 4) {
+                                    if (imageData.data[i + 3] > 0) {
+                                        data.push(i)
+                                    }
+                                }
+                                if (data && data.length > 0) {
+
+                                    drawnPaths.push({
+                                        points: data,
+                                        type: "magic",
+                                    });
+                                }
+                            }
+                        }
+                    }
+                });
+
+                finishFunc()
+
+            });
+
+
+    }
+
+
+    function putDataOnCanvas(thisCanvas, pixels, useOffset, alpha) {
+        const thisContext = thisCanvas.getContext("2d");
+
+        const tCanvas = document.createElement('canvas');
+        const tCtx = tCanvas.getContext('2d');
+        tCanvas.width = thisCanvas.width
+        tCanvas.height = thisCanvas.height
+
+        let canvasData = tCtx.getImageData(0, 0, thisCanvas.width, thisCanvas.height);
+        const data = canvasData.data;
+
+        // pixels是像素的index，并不是实际的像素值
+
+        for (let i = 0; i < pixels.length; i += 1) {
+            data[pixels[i]] = replacementColor.r; // red
+            data[pixels[i] + 1] = replacementColor.g; // green
+            data[pixels[i] + 2] = replacementColor.b; // blue
+            data[pixels[i] + 3] = alpha_255; // alpha
+        }
+
+        if (useOffset) {
+            tCtx.putImageData(canvasData, 0, 0);
+
+            thisContext.save(); // 保存当前的绘图状态
+            if (alpha){
+                thisContext.globalAlpha = 0.7;
+            }
+            thisContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+            thisContext.scale(zoomLevel, zoomLevel);
+            thisContext.drawImage(tCanvas, 0, 0);
+            thisContext.restore();
+        } else {
+            thisContext.putImageData(canvasData, 0, 0);
+        }
+    }
+
+    function stopDrawing() {
+        canvas.style.cursor = "auto";
+        // stop drawing
+        isDrawing = false;
+        sliderWrapper.style.display = 'none';
+    }
+
+    function stopMagicDrawing() {
+        console.log("stopMagicDrawing")
+        hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
+    }
+
+    function stopErasing() {
+        isErasing = false;
+    }
+
+    function stopMove() {
+        isMove = false
+    }
+
+    function hideFileInput() {
+        fileInputWrapper.style.display = 'none';
+    }
+
+
+    function handleImage(file) {
+        // Extract and store the uploaded image name
+        imageName = file.name.split('.')[0];
+        console.log(imageName)
+
+        const image = new Image();
+
+        image.onload = async () => {
+            const spinnerContainer = document.getElementById("spinner-container");
+            const spinnerText = spinnerContainer.querySelector('span');
+            // Change the spinner text
+            spinnerText.textContent = "图片处理中...";
+            // Show the spinner
+            spinnerContainer.classList.remove("d-none");
+
+            // for keeping original sized image
+            const tmp_canvas = document.createElement('canvas');
+            tmp_canvas.width = image.width;
+            tmp_canvas.height = image.height;
+
+            sourceImageWidth = image.width
+            sourceImageHeight = image.height
+
+            const ctx = tmp_canvas.getContext('2d');
+            // for keeping original sized mask
+            maskcanvas.width = image.width;
+            maskcanvas.height = image.height;
+
+            ctx.drawImage(image, 0, 0, image.width, image.height);
+            originalUnresizedImageData = ctx.getImageData(0, 0, image.width, image.height);
+
+            scaleFactor = Math.min(imageCanvas.width / image.width, imageCanvas.height / image.height);
+
+            scaledWidth = image.width * scaleFactor;
+            scaledHeight = image.height * scaleFactor;
+
+            scaledX = (imageCanvas.width - scaledWidth) / 2;
+            scaledY = (imageCanvas.height - scaledHeight) / 2;
+
+            // reset width and height can refresh the canvas so that prev image will not be kept
+            imageCanvas.width = canvasWidth;
+            imageCanvas.height = canvasHeight;
+            imageContext.drawImage(image, scaledX, scaledY, scaledWidth, scaledHeight);
+
+            hiddenCanvas.width = canvasWidth;
+            hiddenCanvas.height = canvasHeight;
+            hiddenContext.drawImage(image, scaledX, scaledY, scaledWidth, scaledHeight);
+
+
+            hideFileInput();
+
+            const scalImageBlobTemp = await canvasToBlob(imageCanvas);
+            const scalImageByteArray = await blobToByteArray(scalImageBlobTemp);
+
+            scalImageBlob = new Blob([scalImageByteArray])
+
+
+            const imageBlob = await canvasToBlob(tmp_canvas);
+            const imageByteArray = await blobToByteArray(imageBlob);
+
+            const formData = new FormData();
+            sourceImageBlob = new Blob([imageByteArray])
+            formData.append("image", sourceImageBlob, "image.png");
+
+
+            // FIXME 初始化
+
+            initSegment(() => {
+                spinnerContainer.classList.add("d-none");
+                console.log('finally')
+            })
+
+        };
+        image.src = URL.createObjectURL(file);
+    }
+
+
+    // 重新绘制图像
+    function reScaleCanvas() {
+
+        context.globalCompositeOperation = 'source-over';
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.save(); // 保存当前的绘图状态
+        context.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        context.scale(zoomLevel, zoomLevel);
+        context.drawImage(tempCanvas, 0, 0);
+        context.restore();
+
+        clearOutOfBrush()
+
+        imageContext.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+        imageContext.save(); // 保存当前的绘图状态
+        imageContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        imageContext.scale(zoomLevel, zoomLevel);
+        imageContext.drawImage(hiddenCanvas, 0, 0);
+        imageContext.restore();
+
+
+        hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
+        hoverContext.save(); // 保存当前的绘图状态
+        hoverContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        hoverContext.scale(zoomLevel, zoomLevel);
+        hoverContext.drawImage(hoverCanvas, 0, 0);
+        hoverContext.restore();
+
+
+        rightContext.clearRect(0, 0, rightCanvas.width, rightCanvas.height);
+        rightContext.save(); // 保存当前的绘图状态
+        rightContext.translate(currentImgOriX, currentImgOriY); // 应用缩放
+        rightContext.scale(zoomLevel, zoomLevel);
+
+        rightContext.drawImage(tempCanvas, 0, 0)
+        rightContext.globalCompositeOperation = 'source-in';
+        rightContext.drawImage(hiddenCanvas, 0, 0);
+        rightContext.globalCompositeOperation = 'source-over';
+
+        rightContext.restore();
+
+
+    }
+
+    // 清除上一笔超出部分（如果需要）
+    function clearOutOfBrush() {
+        // TODO
+        // const max = 100000;
+
+        // // 左
+        // context.clearRect(scaledX * zoomLevel + currentImgOriX,
+        //     currentImgOriY,
+        //     scaledX*zoomLevel,
+        //     max);
+
+        // // 右
+        // context.clearRect(scaledX * zoomLevel+currentImgOriX + scaledWidth*zoomLevel,
+        //     0,
+        //     max,
+        //     max);
+
+        // // 上
+        // context.clearRect(0,
+        //     0,
+        //     max,
+        //     scaledY*zoomLevel + currentImgOriY,
+        // );
+
+        // // 下
+        // context.clearRect(0,
+        //     scaledY * zoomLevel + currentImgOriY + scaledHeight * zoomLevel,
+        //     100000,
+        //     100000
+        // );
+    }
+
+    function realDrawingDrawingOrErasing(event) {
+
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        // Check if the x and y coordinates are within the image boundaries
+        // if (!isMove &&
+        //     x >= scaledX &&
+        //     x < scaledX + scaledWidth &&
+        //     y >= scaledY &&
+        //     y < scaledY + scaledHeight) {
+
+        if (!isMove &&
+            x >= scaledX*zoomLevel  + currentImgOriX &&
+            x < scaledX*zoomLevel + currentImgOriX + scaledWidth*zoomLevel &&
+            y >= scaledY*zoomLevel + currentImgOriY &&
+            y < scaledY*zoomLevel + currentImgOriY + scaledHeight*zoomLevel
+        ) {
+
+            context.beginPath();
+            context.moveTo(lastX, lastY);
+            context.lineTo(x, y);
+            if (isErasing) {
+                // 擦除
+                context.globalCompositeOperation = 'destination-out';
+            } else {
+                context.globalCompositeOperation = 'source-over';
+            }
+            context.strokeStyle = `rgba(147, 112, 219, ${alpha_1})`;
+            context.lineWidth = brushSize * zoomLevel;
+            context.stroke();
+            context.beginPath();
+            context.arc(x, y, brushSize / 2 * zoomLevel, 0, 2 * Math.PI);
+            context.fillStyle = `rgba(147, 112, 219, ${alpha_1})`;
+            context.fill();
+
+
+            clearOutOfBrush()
+
+
+
+            // 临时的上下文应该是位置不变的
+            tempContext.beginPath();
+            tempContext.moveTo(lastX / zoomLevel - currentImgOriX / zoomLevel, lastY / zoomLevel - currentImgOriY / zoomLevel);
+            tempContext.lineTo(x / zoomLevel - currentImgOriX / zoomLevel, y / zoomLevel - currentImgOriY / zoomLevel);
+            if (isErasing) {
+                // 擦除
+                tempContext.globalCompositeOperation = 'destination-out';
+            } else {
+                tempContext.globalCompositeOperation = 'source-over';
+            }
+            tempContext.strokeStyle = `rgba(147, 112, 219, ${alpha_1})`;
+            tempContext.lineWidth = brushSize;
+            tempContext.stroke();
+            tempContext.beginPath();
+            tempContext.arc(x / zoomLevel - currentImgOriX / zoomLevel, y / zoomLevel - currentImgOriY / zoomLevel, brushSize / 2, 0, 2 * Math.PI);
+            tempContext.fillStyle = `rgba(147, 112, 219, ${alpha_1})`;
+            tempContext.fill();
+
+            // tempContext.clearRect(0,
+            //     0,
+            //     scaledX,
+            //     100000);
+            // tempContext.clearRect(scaledX + scaledWidth,
+            //     0,
+            //     100000,
+            //     100000);
+
+            // 同步修改右边
+            syncRightCanvas();
+
+
+            // Add the point to the current path
+            const currentPath = drawnPaths[drawnPaths.length - 1];
+
+            // 未缩放的尺寸放进去
+            currentPath.points.push({
+                fromX: lastX / zoomLevel - currentImgOriX / zoomLevel,
+                fromY: lastY / zoomLevel - currentImgOriY / zoomLevel,
+                toX: x / zoomLevel - currentImgOriX / zoomLevel,
+                toY: y / zoomLevel - currentImgOriY / zoomLevel
+            });
+
+        }
+        context.globalCompositeOperation = 'source-over';
+
+        lastX = x;
+        lastY = y;
+
+    }
+
+    function redrawPaths(thisCanvas, thisDrawnPaths, useOffset) {
+        const thisContext = thisCanvas.getContext("2d");
+        thisContext.clearRect(0, 0, thisCanvas.width, thisCanvas.height);
+
+        for (const path of thisDrawnPaths) {
+            if (path.type === "magic") {
+                // 抠图的撤销
+                putDataOnCanvas(thisCanvas, path.points, useOffset);
+            } else if(path.type === "reset"){
+                realReset(thisCanvas);
+            } else {
+
+                // 画笔的撤销
+                if (useOffset) {
+                    thisContext.save(); // 保存当前的绘图状态
+                    thisContext.translate(currentImgOriX, currentImgOriY)
+                    thisContext.scale(zoomLevel, zoomLevel);
+                }
+
+
+                thisContext.lineWidth = path.lineWidth;
+                for (const point of path.points) {
+
+                    thisContext.beginPath();
+
+                    thisContext.moveTo(point.fromX, point.fromY);
+                    thisContext.lineTo(point.toX, point.toY);
+
+                    if (path.type === "eraser") {
+                        thisContext.globalCompositeOperation = 'destination-out';
+                    } else {
+                        thisContext.globalCompositeOperation = 'source-over';
+                    }
+                    thisContext.strokeStyle = `rgba(147, 112, 219, ${alpha_1})`;
+                    thisContext.stroke();
+
+                    thisContext.beginPath();
+                    thisContext.arc(point.toX, point.toY, path.lineWidth / 2, 0, 2 * Math.PI);
+                    thisContext.fillStyle = `rgba(147, 112, 219, ${alpha_1})`;
+                    thisContext.fill();
+                }
+
+                if (useOffset) {
+                    thisContext.restore();
+                }
+
+                thisContext.globalCompositeOperation = 'source-over';
+            }
+        }
+    }
+
+
+
+    function refreshCursor(x, y){
+        // 清除canvas
+        cursorContext.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
+        lastCursorX = x;
+        lastCursorY = y;
+
+        if(isDrawing || isErasing){
+
+            // 绘制圆圈
+            cursorContext.beginPath();
+            cursorContext.arc(x, y, brushSize / 2 * zoomLevel , 0, 2 * Math.PI);
+            cursorContext.stroke();
+        }
+    }
+
+
+    function reset() {
+        realReset(canvas);
+        realReset(tempCanvas)
+        syncRightCanvas();
+        drawnPaths.push({
+            type: 'reset'
+        });
+    }
+
+    function realReset(resetCanvas) {
+        resetCanvas.getContext('2d').clearRect(0, 0, resetCanvas.width, resetCanvas.height);
+    }
+
+    function moveButtonClick(){
+        isMove = !isMove
+        if(isMove){
+            moveButton.classList.add('painting-handler-item-activate')
+
+            stopErasing();
+            stopDrawing();
+        } else {
+            moveButton.classList.remove('painting-handler-item-activate')
+
+        }
+    }
+
+
+    // 保存结果
+    function saveMask() {
+        // stop everything
+        stopDrawing();
+        stopMagicDrawing();
+        stopErasing();
+        stopMove();
+
+        // Save the mask image
+        const mask_canvas = document.createElement('canvas');
+        mask_canvas.width = originalUnresizedImageData.width;
+        mask_canvas.height = originalUnresizedImageData.height;
+
+        const mask_ctx = mask_canvas.getContext('2d');
+        // this can resize the image automatically
+        mask_ctx.drawImage(tempCanvas, scaledX, scaledY, scaledWidth, scaledHeight,
+            0, 0, originalUnresizedImageData.width, originalUnresizedImageData.height);
+        // change to binary mask
+        const sourceMaskData = mask_ctx.getImageData(0, 0, mask_canvas.width, mask_canvas.height);
+
+
+        const maskData = sourceMaskData.data
+        // 生成黑白的蒙版
+        for (let i = 0; i < maskData.length; i += 4) {
+            const a = maskData[i + 3];
+            if (a <= 0) {
+                maskData[i] = 255;
+                maskData[i + 1] = 255;
+                maskData[i + 2] = 255;
+            } else {
+                maskData[i] = 0;
+                maskData[i + 1] = 0;
+                maskData[i + 2] = 0;
+            }
+            maskData[i + 3] = 255
+        }
+
+        mask_ctx.putImageData(sourceMaskData, 0, 0);
+
+        const maskDataUrl = mask_canvas.toDataURL('image/png');
+        const maskLink = document.createElement('a');
+        maskLink.href = maskDataUrl;
+        maskLink.download = imageName + '_mask.png';
+        maskLink.click();
+
+    }
+
+    // 同步结果面板
+    function syncRightCanvas() {
+        rightContext.clearRect(0, 0, rightCanvas.width, rightCanvas.height);
+        rightContext.save();
+        rightContext.translate(currentImgOriX, currentImgOriY);
+        rightContext.scale(zoomLevel, zoomLevel);
+        rightContext.drawImage(tempCanvas, 0, 0)
+        rightContext.globalCompositeOperation = 'source-in';
+        rightContext.drawImage(hiddenCanvas, 0, 0);
+        rightContext.globalCompositeOperation = 'source-over';
+        rightContext.restore();
+    }
+
+    // 放大图像
+    function zoomIn(){
+        doZoom(0.1)
+    }
+
+    // 缩小图像
+    function zoomOut(){
+        doZoom(-0.1)
+    }
+
+    function reZoom(){
+        currentImgOriX = 0;
+        currentImgOriY = 0;
+        zoomLevel = 1;
+        updateZoomLevelSlider();
+
+        reScaleCanvas();
+    }
+
+    function doZoom(zoomDelta){
+
+        const oldZoom = zoomLevel;
+
+        zoomLevel += zoomDelta;
+
+        zoomLevel = Math.max(zoomManualStepLevel, Math.min(zoomLevel, 10)); // 限制缩放级别在1到10之间
+        updateZoomLevelSlider();
+
+        if(oldZoom === zoomLevel){
+            return
+        }
+
+        const newXY = findImageCenterXY()
+
+        currentImgOriX += (newXY.newX - currentImgOriX / zoomLevel) * zoomDelta > 0 ? -zoomManualStepLevel : zoomManualStepLevel;
+        currentImgOriY += (newXY.newY - currentImgOriY / zoomLevel) * zoomDelta > 0 ? -zoomManualStepLevel : zoomManualStepLevel;
+
+        reScaleCanvas();
+    }
+
+    // 获取当前图像的中心点
+    function findImageCenterXY(){
+        // 原点 + canvas到图片左边距 + 图像宽度的一半
+        const newX = currentImgOriX + scaledWidth / 2 * zoomLevel
+        const newY = currentImgOriY + scaledHeight / 2 * zoomLevel
+
+        return {
+            newX: newX,
+            newY: newY
+        }
+    }
+
+    // 更新显示的尺寸，这里是为了兼容了原生js
+    function updateZoomLevelSlider() {
+        const span = document.getElementById('show-zoom-text');
+        const percentage = Math.floor(zoomLevel * 100) + '%'
+        console.log(zoomLevel)
+        span.textContent = percentage;
+    }
+
+
+    // -----------------监听相关-----------------
+
+    document.addEventListener('contextmenu', function (event) {
+        event.preventDefault(); // Prevent the default context menu from appearing (right-click menu in browsers)
+    });
+
+    // 上传文件监听
+    fileInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+
+        console.log(file);
+        handleImage(file);
+    });
+
+    // 清空
+    resetButton.addEventListener('click', () => {
+
+        reset()
+
+        stopDrawing();
+        stopErasing();
+        stopMagicDrawing();
+        stopMove();
+    });
+
+    // 抠图
+    segmentButton.addEventListener("click", (event) => {
+        canvas.style.cursor = "hand";
+
+        stopDrawing();
+        stopErasing();
+        stopMove();
+    });
+
+    // 画笔
+    drawMaskButton.addEventListener('click', (event) => {
+
+        stopMagicDrawing();
+        stopErasing();
+        stopMove();
+        // toggle slider visibility
+        isDrawing = true
+        sliderWrapper.style.display = (sliderWrapper.style.display === 'none') ? 'block' : 'none';
+    });
+
+    // 橡皮檫
+    eraserButton.addEventListener('click', (event) => {
+        console.log("擦除")
+        stopDrawing();
+        stopMagicDrawing();
+        stopMove();
+
+        isErasing = true;
+        sliderWrapper.style.display = (sliderWrapper.style.display === 'none') ? 'block' : 'none';
+
+    });
+
+    // 撤销
+    undoPathButton.addEventListener('click', () => {
+        if (drawnPaths.length > 0) {
+            console.log("点击撤销2")
+
+            // Remove the last path from the array
+            const lastPath = drawnPaths.pop();
+
+            // 清除悬浮的
+            hoverContext.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
+
+            // Clear the canvas
+            redrawPaths(canvas, drawnPaths, true);
+            clearOutOfBrush()
+            redrawPaths(tempCanvas, drawnPaths, false);
+
+            // 同步修改右边
+            syncRightCanvas();
+
+        }
+    });
+
+    // 画笔大小
+    slider.addEventListener("input", (event) => {
+        brushSize = slider.value;
+        refreshCursor(lastCursorX, lastCursorY)
+
+    });
+
+    // 监听鼠标滚轮事件
+    canvas.addEventListener('wheel', function (event) {
+        event.preventDefault();
+
+        // 获取滚动量
+        const deltaY = event.deltaY;
+        const deltaX = event.deltaX;
+
+        refreshCursor(event.offsetX, event.offsetY)
+
+        if(Number.isInteger(deltaX) &&  Number.isInteger(deltaY)){
+            // 移动
+            lastMoveX = event.offsetX + deltaX;
+            lastMoveY = event.offsetY + deltaY;
+
+            canvasMove(event)
+        } else {
+            // 放大缩小
+            console.log("缩放")
+
+            zoomLevel += event.deltaY > 0 ? -zoomWheelStepLevel : zoomWheelStepLevel;
+            zoomLevel = Math.max(zoomWheelStepLevel, Math.min(zoomLevel, 10)); // 限制缩放级别在1到10之间
+            zoomLevel = Number(zoomLevel.toFixed(2))
+            updateZoomLevelSlider();
+
+            currentImgOriX += (event.offsetX - currentImgOriX / zoomLevel) * (event.deltaY > 0 ? zoomWheelStepLevel : -zoomWheelStepLevel);
+            currentImgOriY += (event.offsetY - currentImgOriY / zoomLevel) * (event.deltaY > 0 ? zoomWheelStepLevel : -zoomWheelStepLevel);
+            reScaleCanvas();
+        }
+    });
+
+    // 画板鼠标按下
+    canvas.addEventListener('mousedown', (event) => {
+
+        if (isMove) {
+            lastMoveX = event.offsetX;
+            lastMoveY = event.offsetY;
+            isDown = true;
+        }
+
+        // cfl开始绘制或者擦除
+        if (isDrawing || isErasing) {
+            lastX = event.offsetX;
+            lastY = event.offsetY;
+            isDown = true;
+
+            // Start a new path
+            drawnPaths.push({
+                type: isErasing ? 'eraser' : 'brush',
+                points: [],
+                lineWidth: brushSize * zoomLevel,
+            });
+            realDrawingDrawingOrErasing(event)
+        }
+    });
+
+    function canvasMove(event){
+        const x = event.offsetX;
+        const y = event.offsetY;
+
+        currentImgOriX += x - lastMoveX;
+        currentImgOriY += y - lastMoveY;
+
+        reScaleCanvas();
+
+        lastMoveX = x;
+        lastMoveY = y
+    }
+
+    // 画板鼠标抬起
+    canvas.addEventListener('mouseup', () => {
+        isDown = false;
+    });
+
+    // 画板移动
+    canvas.addEventListener('mousemove', (event) => {
+
+        refreshCursor(event.offsetX, event.offsetY)
+
+        if ((isDrawing || isErasing || isMove) && isDown) {
+
+            if (isMove) {
+
+                canvasMove(event)
+
+                return
+
+            }
+            // cfl 擦除或者画笔拖动
+            realDrawingDrawingOrErasing(event)
+
+
+        }
+    });
+
+
+
+</script>
+
+</body>
+
+</html>
