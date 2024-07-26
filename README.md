@@ -6,7 +6,7 @@
   <tr>
     <td align="center">
       功能演示<br>
-      <img src="example/show_example.gif" width="500" />
+      <img src="example/show_example.gif" width="800" />
     </td>
   </tr>
 </table>
